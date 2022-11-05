@@ -1,0 +1,5 @@
+servers:
+  - name: backendV1
+    host: localhost
+    port: 9000
+    urlMapping: /backend/v1
