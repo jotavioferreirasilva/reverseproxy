@@ -4,6 +4,11 @@ servers:
     port: 9000
     urlMapping: /backend/v1
     protocol: http
+  - name: stoppedBackend
+    host: localhost
+    port: 9001
+    urlMapping: /backend/stopped
+    protocol: http
 redis:
   host: localhost
   port: 6379

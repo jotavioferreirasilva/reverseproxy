@@ -12,12 +12,11 @@ import (
 func TestMain(m *testing.M) {
 	LoadRedisMock()
 	LoadReverseProxyConfiguration()
+	StartBackend()
 	m.Run()
 }
 
 func TestGivenRunningBackendWhenCallingReverseProxyThenMustReturnBackendResponse(t *testing.T) {
-	StartBackend()
-
 	req := httptest.NewRequest(http.MethodGet, "/backend/v1/ping", nil)
 	responseRecorder := httptest.NewRecorder()
 
@@ -32,7 +31,7 @@ func TestGivenRunningBackendWhenCallingReverseProxyThenMustReturnBackendResponse
 }
 
 func TestGivenNoRunningBackendWhenCallingReverseProxyThenMustReturnInternalServerError(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/backend/v1/ping", nil)
+	req := httptest.NewRequest(http.MethodGet, "/backend/stopped/ping", nil)
 	responseRecorder := httptest.NewRecorder()
 
 	handler.ReverseProxyHandler(responseRecorder, req)
@@ -46,8 +45,6 @@ func TestGivenNoRunningBackendWhenCallingReverseProxyThenMustReturnInternalServe
 }
 
 func TestGivenRunningBackendWhenCallingForTheSecondTimeTheReverseProxyThenMustReturnCachedResponse(t *testing.T) {
-	StartBackend()
-
 	req := httptest.NewRequest(http.MethodGet, "/backend/v1/ping", nil)
 	responseRecorder := httptest.NewRecorder()
 	handler.ReverseProxyHandler(responseRecorder, req)
@@ -66,8 +63,6 @@ func TestGivenRunningBackendWhenCallingForTheSecondTimeTheReverseProxyThenMustRe
 }
 
 func TestGivenRunningBackendWhenCallingWrongMethodInReverseProxyThenMustReturnError404(t *testing.T) {
-	StartBackend()
-
 	req := httptest.NewRequest(http.MethodGet, "/backend/v1/pong", nil)
 	responseRecorder := httptest.NewRecorder()
 
@@ -80,8 +75,6 @@ func TestGivenRunningBackendWhenCallingWrongMethodInReverseProxyThenMustReturnEr
 }
 
 func TestGivenRunningBackendWhenCallingNotMappedBackendInReverseProxyThenMustReturnError404(t *testing.T) {
-	StartBackend()
-
 	req := httptest.NewRequest(http.MethodGet, "/backend/v2/ping", nil)
 	responseRecorder := httptest.NewRecorder()
 
@@ -94,8 +87,6 @@ func TestGivenRunningBackendWhenCallingNotMappedBackendInReverseProxyThenMustRet
 }
 
 func TestGivenRunningBackendWhenCallingPostMethodForTheSecondTimeTheReverseProxyThenMustNotReturnCachedResponse(t *testing.T) {
-	StartBackend()
-
 	req := httptest.NewRequest(http.MethodPost, "/backend/v1/ping", nil)
 	responseRecorder := httptest.NewRecorder()
 	handler.ReverseProxyHandler(responseRecorder, req)
@@ -114,8 +105,6 @@ func TestGivenRunningBackendWhenCallingPostMethodForTheSecondTimeTheReverseProxy
 }
 
 func TestGivenRunningBackendWhenCallingForTheSecondTimeTheReverseProxyWithNoCacheInHeaderThenMustNotReturnCachedResponse(t *testing.T) {
-	StartBackend()
-
 	req := httptest.NewRequest(http.MethodGet, "/backend/v1/ping", nil)
 	responseRecorder := httptest.NewRecorder()
 	handler.ReverseProxyHandler(responseRecorder, req)
